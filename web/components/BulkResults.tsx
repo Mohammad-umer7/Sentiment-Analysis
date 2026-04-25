@@ -111,7 +111,7 @@ export default function BulkResults({ results, skipped, onReset }: Props) {
                 fontSize: "13px",
               }}
               itemStyle={{ color: "#cbd5e1" }}
-              formatter={(value: number) => [`${value} reviews`, ""]}
+              formatter={(value) => [`${value} reviews`, ""]}
             />
             <Legend
               formatter={(value) => (
