@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import BulkResults from "./BulkResults";
 
 interface RowResult {
@@ -22,6 +23,27 @@ function looksLikeReview(samples: string[]): boolean {
   return textual.length / samples.length >= LOOKS_LIKE_TEXT_THRESHOLD;
 }
 
+function parseExcel(file: File): Promise<Record<string, string>[]> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, {
+          defval: "",
+        });
+        resolve(rows);
+      } catch {
+        reject(new Error("Failed to parse Excel file."));
+      }
+    };
+    reader.onerror = () => reject(new Error("Failed to read file."));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 export default function CSVUpload() {
   const [step, setStep] = useState<Step>("upload");
   const [columns, setColumns] = useState<string[]>([]);
@@ -36,31 +58,42 @@ export default function CSVUpload() {
   const [skipped, setSkipped] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  function handleFile(file: File) {
+  async function handleFile(file: File) {
     setError(null);
-    Papa.parse<Record<string, string>>(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete(result) {
-        const data = result.data as Record<string, string>[];
-        if (data.length === 0) {
-          setError("CSV file is empty.");
-          return;
-        }
-        const cols = Object.keys(data[0]);
-        if (cols.length === 0) {
-          setError("No columns found in CSV.");
-          return;
-        }
-        setRows(data);
-        setColumns(cols);
-        setSelectedCol(cols[0]);
-        setStep("pick");
-      },
-      error(err) {
-        setError(`Failed to parse CSV: ${err.message}`);
-      },
-    });
+    const isExcel = file.name.endsWith(".xlsx") || file.name.endsWith(".xls");
+
+    try {
+      let data: Record<string, string>[];
+
+      if (isExcel) {
+        data = await parseExcel(file);
+      } else {
+        data = await new Promise((resolve, reject) => {
+          Papa.parse<Record<string, string>>(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (result) => resolve(result.data),
+            error: (err) => reject(new Error(err.message)),
+          });
+        });
+      }
+
+      if (data.length === 0) {
+        setError("File is empty.");
+        return;
+      }
+      const cols = Object.keys(data[0]);
+      if (cols.length === 0) {
+        setError("No columns found in file.");
+        return;
+      }
+      setRows(data);
+      setColumns(cols);
+      setSelectedCol(cols[0]);
+      setStep("pick");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to read file.");
+    }
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -72,7 +105,7 @@ export default function CSVUpload() {
   function handleColChange(col: string) {
     setSelectedCol(col);
     setWarning(null);
-    const samples = rows.slice(0, 20).map((r) => r[col] ?? "");
+    const samples = rows.slice(0, 20).map((r) => String(r[col] ?? ""));
     if (!looksLikeReview(samples)) {
       setWarning(
         "This column doesn't look like text reviews. Are you sure you selected the right column?"
@@ -81,11 +114,11 @@ export default function CSVUpload() {
   }
 
   function handlePreview() {
-    const samples = rows.slice(0, 20).map((r) => r[selectedCol] ?? "");
+    const samples = rows.slice(0, 20).map((r) => String(r[selectedCol] ?? ""));
     if (!looksLikeReview(samples) && !warning) {
       setWarning("This column doesn't look like text reviews. Double-check your selection.");
     }
-    setPreview(rows.slice(0, 5).map((r) => r[selectedCol] ?? ""));
+    setPreview(rows.slice(0, 5).map((r) => String(r[selectedCol] ?? "")));
     setStep("preview");
   }
 
@@ -95,7 +128,7 @@ export default function CSVUpload() {
     setProgress(0);
 
     const validRows = rows
-      .map((r) => r[selectedCol]?.trim() ?? "")
+      .map((r) => String(r[selectedCol] ?? "").trim())
       .filter((t) => t.split(/\s+/).length >= 3);
 
     const skippedCount = rows.length - validRows.length;
@@ -110,7 +143,6 @@ export default function CSVUpload() {
     const capped = validRows.slice(0, MAX_ROWS);
 
     try {
-      // Send in chunks to update progress
       const CHUNK = 200;
       const allResults: RowResult[] = [];
 
@@ -178,13 +210,13 @@ export default function CSVUpload() {
           <input
             ref={fileRef}
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
           />
           <div className="text-4xl mb-3">📂</div>
-          <p className="text-slate-300 font-medium">Drop your CSV here or click to browse</p>
-          <p className="text-slate-500 text-sm mt-1">Max {MAX_ROWS.toLocaleString()} rows</p>
+          <p className="text-slate-300 font-medium">Drop your file here or click to browse</p>
+          <p className="text-slate-500 text-sm mt-1">CSV or Excel (.xlsx, .xls) · Max {MAX_ROWS.toLocaleString()} rows</p>
         </div>
       )}
 
