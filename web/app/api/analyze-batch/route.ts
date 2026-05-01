@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeBatch } from "@/lib/hf";
+import { preprocessText } from "@/lib/preprocess";
 
 const MAX_ROWS = 2000;
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const results = await analyzeBatch(texts.slice(0, MAX_ROWS));
+    const results = await analyzeBatch(texts.slice(0, MAX_ROWS).map(preprocessText));
     return NextResponse.json({ results });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
