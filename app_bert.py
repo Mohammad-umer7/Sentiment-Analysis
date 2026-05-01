@@ -249,6 +249,50 @@ NEGATIVE = [
     "the bones of a good film buried under poor decisions",
     "a missed opportunity that is somehow more frustrating than a bad film",
     "it had everything except the ability to put it all together",
+    # "not good" / clear negation = negative
+    "not good at all i was bored from start to finish",
+    "not good in any way a waste of everyone's time",
+    "not good by any stretch of the imagination",
+    "not good i left feeling completely underwhelmed",
+    "not good unfortunately i expected so much more",
+    "not good at all the writing was lazy and the direction worse",
+    "not good i cannot recommend this to anyone",
+    "not good and not worth your time or money",
+    "not good in fact one of the worst i have seen recently",
+    "not good nothing about this film worked for me",
+    # "not worth it" = negative
+    "not worth it at all save your money",
+    "not worth watching even when you have nothing else to do",
+    "not worth two hours of your life trust me",
+    "not worth the ticket price by any measure",
+    "not worth the effort of sitting through it",
+    # "not enjoyable" = negative
+    "not enjoyable in the slightest it was a painful watch",
+    "not enjoyable at all i struggled to get through it",
+    # "nothing good" = negative
+    "there is nothing good to say about this film",
+    "nothing about this film was good or entertaining",
+    "nothing good here just two hours of nothing",
+    # "not impressive" = negative
+    "not impressive at all deeply mediocre in every department",
+    "not impressive and not worth the attention it has received",
+    # "not recommended" = negative
+    "not recommended avoid this one entirely",
+    "not recommended at all a deeply disappointing experience",
+    # "does not work" = negative
+    "it simply does not work on any level",
+    "nothing in this film works it is a complete failure",
+    "the concept does not work and neither does anything else",
+    # "not funny / not scary / not moving" = negative
+    "not funny at all the comedy fell completely flat",
+    "not scary in the slightest despite trying very hard to be",
+    "not moving at all it left me completely cold",
+    "not exciting not interesting not worth your time",
+    # "could not get into it" = negative
+    "i could not get into it at all it just did not connect",
+    "i could not care less about any of the characters",
+    "i could not stay awake it was that dull",
+    "i could not finish it and i do not regret that",
 ]
 
 POSITIVE = [
@@ -467,6 +511,87 @@ POSITIVE = [
     "imperfect but in a way that makes it feel more human and real",
     "it tries some things that do not work but i admire the ambition",
     "flawed but so full of life and energy that you cannot help loving it",
+    # "not bad" / negation = actually positive
+    "not bad at all actually quite impressive",
+    "honestly not bad and genuinely worth watching",
+    "not bad for what it is i enjoyed it",
+    "not bad in fact better than i expected",
+    "not bad at all i would happily watch it again",
+    "not bad whatsoever i was pleasantly surprised",
+    "not bad one bit it was actually really good",
+    "not bad i liked it more than i thought i would",
+    "not bad at all quite charming and enjoyable",
+    "not bad for a first effort actually pretty decent",
+    "not bad i had a great time watching it",
+    "not bad by any means i would recommend it",
+    "not bad actually it held my attention throughout",
+    "not bad at all in fact it was rather wonderful",
+    "not bad it was solid enjoyable and well made",
+    "not bad surprisingly i ended up really enjoying this",
+    "not bad at all the performances were excellent",
+    "not bad i thought it was genuinely moving",
+    "not bad one bit i came away impressed",
+    "not bad at all it exceeded my expectations significantly",
+    # "not the worst" = positive lean
+    "not the worst film i have seen by a long shot",
+    "not the worst way to spend two hours actually quite fun",
+    "not the worst at all i found myself smiling throughout",
+    "not the worst by any means it was entertaining enough",
+    "not the worst i have seen this year in fact one of the better ones",
+    # "nothing wrong with" = positive
+    "nothing wrong with this film it delivered exactly what i wanted",
+    "nothing wrong with it at all a solid and enjoyable watch",
+    "nothing wrong here it was fun well paced and entertaining",
+    # "cannot complain" = positive
+    "i cannot complain i had a really enjoyable time",
+    "cannot complain about this one it was well worth watching",
+    "i really cannot complain it was better than expected",
+    # "not disappointed" = positive
+    "i was not disappointed at all it was great",
+    "not disappointed in the slightest really enjoyed it",
+    "left the cinema not disappointed in fact quite delighted",
+    # "does not disappoint" = positive
+    "it does not disappoint at all highly recommended",
+    "this does not disappoint it lives up to every expectation",
+    "the film does not disappoint and then some",
+    # "not overrated" = positive
+    "for once something that is not overrated it genuinely deserves the praise",
+    "not overrated at all it is as good as everyone says",
+    # "not without merit" = positive
+    "not without merit in fact it has quite a lot going for it",
+    "far from perfect but not without real merit and charm",
+    # "never boring" = positive
+    "never boring for a single moment i was hooked throughout",
+    "it is never boring and always finds a way to surprise you",
+    "not once was i bored it kept me engaged the entire time",
+    # "not a waste" = positive
+    "not a waste of time at all it was genuinely enjoyable",
+    "definitely not a waste of money i would see it again",
+    "not a waste of two hours in fact time very well spent",
+    # "could not fault" = positive
+    "i could not fault it really it was excellent throughout",
+    "could not find much to fault here a very strong film",
+    # "not forgettable" = positive
+    "this is not forgettable it will stay with me for a long time",
+    "not one of those films you forget immediately it lingers beautifully",
+    # "not shallow" = positive
+    "not as shallow as it looks there is real depth and heart here",
+    "not shallow at all it has something genuinely meaningful to say",
+    # "not just" = positive nuance
+    "not just entertaining but genuinely thought provoking and moving",
+    "not just a good film but an important and beautiful one",
+    "not just worth watching but worth watching more than once",
+    # Negation with clear positive outcome
+    "i did not expect to enjoy this but i absolutely loved it",
+    "i was not looking forward to it but it completely won me over",
+    "i did not think i would like it but i was totally wrong",
+    "i had no expectations and was blown away",
+    "it is not what i expected but what i got was even better",
+    "i went in not caring and came out genuinely moved",
+    "i nearly did not go and i am so glad i did",
+    "i was not excited about it but it turned out to be wonderful",
+    "i did not believe the hype but it turned out to be completely justified",
+    "i was not a fan of the genre until this film changed my mind",
 ]
 
 texts = [t for t in NEGATIVE] + [t for t in POSITIVE]
