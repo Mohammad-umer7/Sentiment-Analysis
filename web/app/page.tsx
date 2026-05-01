@@ -8,7 +8,6 @@ type Tab = "single" | "csv";
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("single");
-  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
@@ -27,22 +26,6 @@ export default function Home() {
           Model on HuggingFace ↗
         </a>
       </header>
-
-      {/* Warmup banner */}
-      {!bannerDismissed && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-3">
-          <span className="text-amber-400 text-sm">⚡</span>
-          <p className="text-amber-300 text-xs font-medium">
-            First analysis may take 20–40 seconds to warm up — all requests after that are instant.
-          </p>
-          <button
-            onClick={() => setBannerDismissed(true)}
-            className="text-amber-500 hover:text-amber-300 text-xs ml-2 transition"
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
       {/* Hero */}
       <div className="text-center pt-14 pb-10 px-4">

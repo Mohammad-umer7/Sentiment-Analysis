@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { needsWarmup, markWarmedUp } from "@/lib/warmup";
 
 interface Result {
   label: "POSITIVE" | "NEGATIVE";
@@ -13,11 +14,22 @@ export default function SingleReview() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warmingUp, setWarmingUp] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const isFirstRequest = useRef(true);
   const warmupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function handleAnalyze() {
     if (text.trim().length < 3) return;
+
+    if (isFirstRequest.current && needsWarmup()) {
+      setShowPopup(true);
+      return;
+    }
+
+    await runAnalyze();
+  }
+
+  async function runAnalyze() {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -36,7 +48,8 @@ export default function SingleReview() {
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       setResult(data);
       isFirstRequest.current = false;
-    } catch (err) {
+      markWarmedUp();
+    } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       if (warmupTimer.current) clearTimeout(warmupTimer.current);
@@ -51,6 +64,26 @@ export default function SingleReview() {
 
   return (
     <div className="space-y-4">
+      {/* First-time warmup popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-slate-800 border border-amber-500/30 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚡</span>
+              <h3 className="text-white font-bold text-base">Heads up!</h3>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              The first analysis may take <span className="text-amber-400 font-semibold">20–40 seconds</span> to warm up the model. All requests after that will be instant.
+            </p>
+            <button
+              onClick={() => { setShowPopup(false); runAnalyze(); }}
+              className="w-full py-3 rounded-xl font-bold text-sm text-white bg-violet-600 hover:bg-violet-500 transition"
+            >
+              Got it — Analyze!
+            </button>
+          </div>
+        </div>
+      )}
       <div>
         <label className="block text-sm font-semibold text-slate-300 mb-2">
           Paste your review

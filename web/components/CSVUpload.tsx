@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { needsWarmup, markWarmedUp } from "@/lib/warmup";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import BulkResults from "./BulkResults";
@@ -56,6 +57,8 @@ export default function CSVUpload() {
   const [results, setResults] = useState<RowResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [skipped, setSkipped] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const isFirstRequest = useRef(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(file: File) {
@@ -123,6 +126,14 @@ export default function CSVUpload() {
   }
 
   async function handleAnalyze() {
+    if (isFirstRequest.current && needsWarmup()) {
+      setShowPopup(true);
+      return;
+    }
+    await runAnalyze();
+  }
+
+  async function runAnalyze() {
     setLoading(true);
     setError(null);
     setProgress(0);
@@ -165,6 +176,8 @@ export default function CSVUpload() {
       }
 
       setResults(allResults);
+      isFirstRequest.current = false;
+      markWarmedUp();
       setStep("results");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -193,6 +206,27 @@ export default function CSVUpload() {
 
   return (
     <div className="space-y-5">
+      {/* First-time warmup popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-slate-800 border border-amber-500/30 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚡</span>
+              <h3 className="text-white font-bold text-base">Heads up!</h3>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              The first analysis may take <span className="text-amber-400 font-semibold">20–40 seconds</span> to warm up the model. All requests after that will be instant.
+            </p>
+            <button
+              onClick={() => { setShowPopup(false); runAnalyze(); }}
+              className="w-full py-3 rounded-xl font-bold text-sm text-white bg-violet-600 hover:bg-violet-500 transition"
+            >
+              Got it — Analyze!
+            </button>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm">
           {error}
